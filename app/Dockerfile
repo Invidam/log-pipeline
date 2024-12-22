@@ -11,13 +11,13 @@ COPY ./go.mod ./go.sum ./
 RUN go mod download
 
 # Copy the entire project
-COPY ./app .
+COPY . .
 
 # Build the Go app (replace `your-app` with your app name)
 RUN go build -o loggen
 
 # Use a minimal base image for the final build
-FROM alpine:latest
+FROM scratch
 
 # Set working directory in final image
 WORKDIR /root/app

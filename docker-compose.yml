@@ -22,30 +22,33 @@ services:
     build:
       context: ./consumer
     depends_on:
+      - zookeeper
       - kafka
     environment:
       - KAFKA_BROKER=kafka:9092
     command: ["./consumer"]
 
   app:
-    image: log-generator:v0.1         # Use the locally built image
+    build:
+      context: ./app
+#    image: log-generator:v0.1         # Use the locally built image
     container_name: loggen-my
     volumes:
       - shared-log:/root/app  # Mount the shared named volume
     depends_on:
-      - fluentd
+      - aggregator
 
-  fluentd:
+  aggregator:
     build:
-      context: ./fluentd
-    container_name: fluentd
+      context: ./aggregator
+    container_name: aggregator
     environment:
       - KAFKA_BROKER=kafka:9092
     platform: linux/amd64
     volumes:
       - shared-log:/app                    # Mount the shared named volume
-      - ./fluentd/fluent.conf:/fluentd/etc/fluent.conf  # Fluentd configuration
-    command: ["fluentd", "-c", "/fluentd/etc/fluent.conf", "-vv"]
+      - ./aggregator/fluent.conf:/aggregator/etc/fluent.conf  # Fluentd configuration
+    command: ["fluentd", "-c", "/aggregator/etc/fluent.conf", "-vv"]
     depends_on:
       - kafka
 

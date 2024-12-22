@@ -10,7 +10,7 @@ COPY . .
 RUN go build -o consumer
 
 # Use a minimal base image for the final build
-FROM alpine:latest
+FROM scratch
 
 WORKDIR /root/
 COPY --from=build /app/consumer .
